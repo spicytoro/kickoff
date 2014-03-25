@@ -35,7 +35,7 @@ function scene:createScene( event )
 
     loadButton:addEventListener( "tap", function( event )
         globals.levelNum = event.target.levelNum
-        storyboard.gotoScene( "scene_game", "fade", 250 )
+        storyboard.gotoScene( "scene_game", "fromRight", 250 )
 
     end )
 
@@ -54,7 +54,7 @@ function scene:createScene( event )
     loadButton:addEventListener( "tap", function( event )
         globals.levelNum = event.target.levelNum
         playSound("select")
-        storyboard.gotoScene( "scene_splash", "fade", 250 )
+        storyboard.gotoScene( "scene_splash", "fromLeft", 250 )
 
     end )
 

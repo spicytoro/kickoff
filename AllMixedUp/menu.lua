@@ -51,7 +51,7 @@ function scene:createScene( event )
 
 	function playBtn:touch(e)
 		if (e.phase == "began") then
-			storyboard.gotoScene( "gameplay", "fromRight", 500 )
+			storyboard.gotoScene( "gameplay" )
 
 		end
 	end

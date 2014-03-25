@@ -6,6 +6,8 @@ local globals = require( "globals" )
 
 local storyboard = require( "storyboard" )
 local scene = storyboard.newScene()
+local ScoreKeeper = require("ScoreKeeper")
+local banner = require( "banner" )
 
 -- Clear previous scene
 storyboard.removeAll()
@@ -32,53 +34,79 @@ function scene:createScene( event )
 
   local Win = display.newText("WIN!", 0, 0, globals.font.bold, 72 )
   Win.x = display.contentCenterX
-  Win.y = display.contentCenterY -150
+  Win.y = display.contentCenterY -200
   Win.strokeWidth=6
   Win:setFillColor(0, 137/255, 254/255)
   Win:setStrokeColor(255/255, 255/255, 255/255)
 
-  local resultsBoard=display.newRect(screenW/2, screenH/2, screenW/1.25, screenH/2.7)
+  local resultsBoard=display.newRect(screenW/2, screenH/2, screenW/1.25, screenH*.5)
   resultsBoard.strokeWidth = 9
   resultsBoard:setFillColor(1, 169/255, 171/255)
   resultsBoard:setStrokeColor(255, 255/255, 255/255)
   resultsBoard.alpha=.7
 
 
+  local score = ScoreKeeper.new("level"..globals.levelNum, "dev")
+
+
 
 
   local resultsText = display.newText( result, 0, 0, globals.font.bold, 64 )
   resultsText.x = display.contentCenterX-150
-  resultsText.y = display.contentCenterY - 60
+  resultsText.y = display.contentCenterY - 80
   resultsText:setFillColor(0, 137/255, 254/255)
 
   local points = display.newText("Points", 0, 0, globals.font.bold, 32 )
   points.x = display.contentCenterX-150
-  points.y = display.contentCenterY -100
+  points.y = display.contentCenterY -130
   points:setFillColor(0, 137/255, 254/255)
 
 
   local timeText = display.newText( time, 0, 0, globals.font.bold, 64 )
   timeText.x = display.contentCenterX+150
-  timeText.y = display.contentCenterY-60
+  timeText.y = display.contentCenterY-80
   timeText:setFillColor(0, 137/255, 254/255)
 
 
   local time = display.newText("Time", 0, 0, globals.font.bold, 32 )
   time.x = display.contentCenterX+150
-  time.y = display.contentCenterY -100
+  time.y = display.contentCenterY -130
   time:setFillColor(0, 137/255, 254/255)
 
+  local highscore = display.newText("High Score", 0, 0, globals.font.bold, 32 )
+  highscore.x = display.contentCenterX
+  highscore.y = display.contentCenterY -10
+  highscore:setFillColor(0, 137/255, 254/255)
 
+  local highscoreText = display.newText( score:getHighScore(), 0, 0, globals.font.bold, 64 )
+  highscoreText.x = display.contentCenterX
+  highscoreText.y = display.contentCenterY + 40
+  highscoreText:setFillColor(0, 137/255, 254/255)
+
+  if (score:newHighScore()) then
+      local banner = banner.new({
+        text = "New High Score!", 
+        time = 5000, 
+        inX = display.contentCenterX,
+        inY = 150,
+        toX = display.contentCenterX,
+        toY = -100
+        })
+      highscoreText:setFillColor(0, .8, 0)
+      highscore:setFillColor(0, .8, 0)
+  end
 
   group:insert(resultsBoard)
   group:insert(resultsText)
-  group:insert(timeText)
+  group:insert(timeText) 
   group:insert(Win)
   group:insert(points)
+  group:insert(highscoreText)
+  group:insert(highscore)
   group:insert(time)
   local mainMenuButton = display.newText( "Main Menu", 0, 0, globals.font.bold, 64 )
   mainMenuButton.x = display.contentCenterX
-  mainMenuButton.y = display.contentCenterY+50
+  mainMenuButton.y = display.contentCenterY+120
   mainMenuButton:setFillColor(0, 137/255, 254/255)
   local function onTap( event )
     storyboard.gotoScene( "scene_splash", "fade", 300 )
@@ -91,7 +119,7 @@ function scene:createScene( event )
  -- if ( levelNum <= 3 ) then
   local nextLevelButton = display.newText( "Play Again", 0, 0, globals.font.bold, 64 )
   nextLevelButton.x = display.contentCenterX
-  nextLevelButton.y = display.contentCenterY + 124
+  nextLevelButton.y = display.contentCenterY + 194
   nextLevelButton:setFillColor(0, 137/255, 254/255)
 
 

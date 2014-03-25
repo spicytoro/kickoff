@@ -1,0 +1,1 @@
+{"lastHS":0,"path":"level2.txt","score":600,"HS":600,"beatHS":true}

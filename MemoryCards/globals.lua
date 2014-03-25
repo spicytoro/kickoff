@@ -1,6 +1,8 @@
 -- globals.lua
 local globals = {}
 
+globals.timePen = 2
+
 globals.font = 
 {
   regular = native.systemFont,

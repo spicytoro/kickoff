@@ -32,7 +32,7 @@ function scene:createScene( event )
   
   local function onTap( event )
     playSound("select")
-    storyboard.gotoScene( "scene_menu", "fade", 300 )
+    storyboard.gotoScene( "scene_menu", "fromRight", 300 )
   end
 
 

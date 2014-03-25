@@ -6,6 +6,7 @@ local globals = require( "globals" )
 local storyboard = require( "storyboard" )
 local scene = storyboard.newScene()
 local pauseGroup =display.newGroup()
+local ScoreKeeper = require( "ScoreKeeper" )
 
 
 
@@ -29,7 +30,6 @@ local buttonImages = {{1,1, 2,2, 3,3, 4,4, 5,5, 6,6},  {1,1, 2,2, 3,3, 4,4, 5,5,
 local lastButton=display.newText("", 0,0,system.native, 60)
 local cardsLeft
 local number
-local txt_timer
 local pause=false
 local cardsFlipped = false
 local scale=globals.size[levelNum]
@@ -48,29 +48,48 @@ local pauseBoard
 local pauseT
 local resumeButton
 local menuButton
+local scoreSaver = ScoreKeeper.new("level"..globals.levelNum, "dev")
 
+scoreSaver:print(  )
 
 ---------------------------------------------------------------------------------
 -- BEGINNING OF YOUR IMPLEMENTATION
 ---------------------------------------------------------------------------------
 
 function scene.updateScore(change)
-  score = score + change
-  scoreText.text = score
+  if (score + change > 0) then
+    score = score + change
+    scoreText.text = score
+  end
+    
+  
 
   if (change>0)then
     cardsLeft=cardsLeft-2
     print(cardsLeft)
   end
 
-  if ( cardsLeft ==0 ) then
+  if ( cardsLeft == 0 ) then
     -- level over
+    scoreSaver:update(score)
+    scoreSaver:print()
+    scoreSaver = nil
     globals.score = score
     globals.timer = number
     storyboard.gotoScene( "scene_results" )
   end
 end
 
+function scene.timePenalty( change )
+
+  if (score > 0) then
+    score = score - 1; 
+    scoreText.text = score
+  end
+
+end
+
+local timerOne = timer.performWithDelay( 1000, scene.timePenalty, -1 )
 
 function scene.pause()
   if cardsFlipped then
@@ -305,22 +324,17 @@ function scene:createScene( event )
   pauseText.touch = scene.pause 
   pauseText:addEventListener( "touch", pauseText)
 
-  txt_timer = display.newText(0, 0, 0, globals.font.bold, 48)
-  txt_timer.x = 50
-  txt_timer.y = 30
-  txt_timer:setFillColor(0, 137/255, 254/255)
+  
   function fn_counter()
     if(pause==false) then
-    number = number + 1
-    txt_timer.text = number
+      number = number + 1
     end
   end
 
-  timer.performWithDelay(1000, fn_counter, 0)
+  local timerTwo = timer.performWithDelay(1000, fn_counter, -1)
   group:insert(topBar)
   group:insert(pauseText)
   group:insert( scoreText )
-  group:insert(txt_timer)
   self.cards(levelNum)
   group:insert( matchText )
   pauseGroup.isVisible=false
