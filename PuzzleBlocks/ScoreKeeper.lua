@@ -10,7 +10,7 @@ local DataSaver = require("DataSaver")
 -- Constructor --
 -----------------
 
-function ScoreKeeper.new( key)
+function ScoreKeeper.new( key, input )
 	local ScoreKeeper = {
 		safe = DataSaver.new(key, input);
 		key = key
