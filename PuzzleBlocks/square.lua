@@ -192,7 +192,7 @@ end
 
 function square:removeSquare( )
 	local one = transition.to(self.image, {
-	time = 500,
+	time = 250,
 	width = 50,
 	height = 50, 
 	alpha = 0,
@@ -200,14 +200,9 @@ function square:removeSquare( )
 end
 
 function square:reviveSquare( )
-	for i=1,7 do
-		for j=1,7 do
-			_board[i][j] = 0; 
-			_board:updateColor();
-		end
-	end
+
 	local one = transition.to(self.image, {
-	time = 500,
+	time = 250,
 	width = _squareSize,
 	height = _squareSize, 
 	alpha = 1, 

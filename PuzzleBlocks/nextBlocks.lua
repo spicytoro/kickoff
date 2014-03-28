@@ -19,8 +19,8 @@ function nextBlocks.new(  )
 	local y = H-130
 	local spacing = 48
 	local size = 44
-	for j=1, 7 do
-		nextBlocks[j] = nextSquare.new(j, x - (3*spacing) + spacing*(j-1), y, size, size)
+	for j=1, 5 do
+		nextBlocks[j] = nextSquare.new(j, x - (2*spacing) + spacing*(j-1), y, size, size)
 	end
 	return setmetatable( nextBlocks, nextBlocks_mt )
 end
@@ -33,7 +33,15 @@ function nextBlocks:toColor( )
 	for i=1,_waveNumber do
 		self[i]:toColor()
 	end
-	
+	for i=_waveNumber+1,5 do
+		self[i]:toColor(0)
+	end
+end
+
+function nextBlocks:remove(  )
+	for i=1,5 do
+		self[i]:remove()
+	end
 end
 
 return nextBlocks

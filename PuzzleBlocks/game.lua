@@ -49,16 +49,25 @@ function scene:createScene( event )
 
 	local playAgain = display.newRect( W - 50, 50, 50, 50 )
 		playAgain:setFillColor( .5, .5, .5 )
-
-	function touchPlayAgain( e )
-		if (e.phase == "ended") then
-			board:revive();
-			board:nextWave()
+	
+	function playAgain:touch(e)
+		if (e.phase == "began") then
+			display.getCurrentStage( ):setFocus( self )
+			self.hasFocus = true
+			
+		elseif (self.hasFocus) then
+			if(e.phase == "ended" or e.phase == "canceled") then
+				_score = 0;
+				scoreText.text = "0"
+				board:revive();
+				display.getCurrentStage( ):setFocus(nil)
+				self.hasFocus = nil
+			end
 		end
 	end
+	
 
-	playAgain:addEventListener( "touch", touchPlayAgain )
-
+	playAgain:addEventListener( "touch", playAgain )
 
 	local highScoreText = display.newText( { 
 		text = "Best: "..ScoreKeeper:getHighScore(), 
@@ -77,9 +86,14 @@ function scene:createScene( event )
 			board:remove()
 		end
 
+		highScoreText.text = "Best: "..ScoreKeeper:getHighScore()
 
 		if (_score > 100) then
-			_waveNumber = math.min(math.floor(math.pow( _score, .25 ),5))
+			local hold = math.floor(math.pow( _score, .25 ))
+			if (hold > 5) then
+				hold = 5; 
+			end
+			_waveNumber = hold; 
 		else 
 			_waveNumber = 3; 
 		end
@@ -91,7 +105,6 @@ function scene:createScene( event )
 					_colors:add(math.random(1,5))
 				end
 				board:nextWave(_waveNumber)
-				board:print( )
 				_placed = false; 
 			end
 		else

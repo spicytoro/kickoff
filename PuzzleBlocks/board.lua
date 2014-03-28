@@ -141,7 +141,7 @@ function board:nextWave( squares )
 		end
 	--	board:removeLines();
 	end
-	
+
 	if (self:spotsLeft() <= squares) then
 		squares = self:spotsLeft() + 1;
 	end
@@ -220,8 +220,15 @@ function board:removeLines( )
 	if (#toDelete > 0) then
 		if (not _added) then
 			local function addScore ()
-				banner.new(#toDelete*#toDelete, W/2, H/2 )
-				_score = _score + #toDelete*#toDelete
+				banner.new("+" .. #toDelete*#toDelete*_waveNumber, W/2, H/2 )
+
+				local function timer2R(  )
+				--	banner.new("x" .. _waveNumber, W/2, H/2 - 150,100 )
+				end
+
+				local timer2 = timer.performWithDelay( 300, timer2R ,1 )
+
+				_score = _score + #toDelete*#toDelete*_waveNumber
 				ScoreKeeper:update(_score)
 			end
 			local timer = timer.performWithDelay( 500, addScore, 1 )
@@ -248,7 +255,7 @@ function board:remove( )
 	end
 	
 	
-	local timer = timer.performWithDelay( 10, removeBlock, 49 ) 
+	local timer = timer.performWithDelay( 1, removeBlock, 49 ) 
 end
 
 function board:revive( )
@@ -260,26 +267,23 @@ function board:revive( )
 			i = 1
 			j = j+1
 		end
+		_board[i][j] = 0;
+		_board:updateColor();
 		self.paint[i][j]:reviveSquare( );
 		i = i + 1; 
 	end
 	
-	local timer = timer.performWithDelay( 10, reviveBlock, 49 ) 
+	local timer1 = timer.performWithDelay( 1, reviveBlock, 49 ) 
 
 	function reset(  )
 		_waveNumber = 3; 
-		_pickedUp = nil;
-		_board = nil; 
-		_nextBlocks = nil
 		_placed = true; 
-		_gotLine = false; 
-		_squareSize = 82; 
-		_score = 0; 
+		_gotLine = false;  
 		_added = false;
 		_gameOver = false;
 	end
 
-	local resetTimer = timer.performWithDelay( 500, reset, 49 ) 
+	local timer2 = timer.performWithDelay( 2000, reset, 1 ) 
 end
 
 function board:scanRow( row )

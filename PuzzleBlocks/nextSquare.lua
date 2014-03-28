@@ -41,8 +41,8 @@ end
 -------------
 -- Methods -- 
 -------------
-function nextSquare:toColor( )
-	toColor(self.image, _colors[self.col])
+function nextSquare:toColor( input )
+	toColor(self.image, input or _colors[self.col])
 end
 
 
