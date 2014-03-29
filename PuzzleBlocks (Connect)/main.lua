@@ -3,9 +3,9 @@
 -- main.lua
 --
 -----------------------------------------------------------------------------------------
-
+local W, H = display.contentWidth, display.contentHeight
 local storyboard = require "storyboard"
-local bg = display.newRect( 300, 512, 600, 1024 )
+local bg = display.newRect( W/2, H/2, W, H )
 bg:setFillColor( 1,1,1 )
 -- load scenetemplate.lua
 storyboard.gotoScene( "game" )

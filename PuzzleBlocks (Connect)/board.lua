@@ -33,8 +33,8 @@ function board.new(  )
 
 	local x = W/2
 	local y = H/2
-	local spacing = 84
-	local size = 82
+	local spacing = 90
+	local size = 88
 	
 	for i=1, 7 do
 		for j=1, 7 do
@@ -140,9 +140,10 @@ function board:spotsLeft ()
 end 
 
 function board:nextWave( squares )
-	
+	 
 	local function placeIt ()
 		if (not _gameOver) then
+			
 			if (self:spotsLeft() > 0) then 
 				local row = math.random(1,7)
 				local col = math.random(1,7)
@@ -153,11 +154,13 @@ function board:nextWave( squares )
 				end
 				self:place(row,col,_colors:remove())
 				_nextBlocks:toColor()
+			--	_nextBlocksTop:toColor()
 
 			--	self:print(  )
 			else
-				print( "game over!" )
-				_gameOver = true; 
+
+			--	print( self.finder:checkMoves() )
+			--	_gameOver = not self.finder:checkMoves(); 
 			end 
 		end
 	--	board:removeLines();
@@ -169,11 +172,11 @@ function board:nextWave( squares )
 	
 	local timerz = timer.performWithDelay( 250, placeIt, squares )
 
-	local function removeIt(  )
-		self:removeLines()
-	end
+--	local function removeIt(  )
+--		self:removeLines()
+--	end
 
-	local remover = timer.performWithDelay( 250*(squares) + 50, removeIt, 1 )
+--	local remover = timer.performWithDelay( 250*(squares) + 50, removeIt, 1 )
 end
 
 function board:squareToWhite(point)
@@ -181,6 +184,7 @@ function board:squareToWhite(point)
 	local col = point[2];
 	if (self[row][col] ~= 0) then	
 		self.paint[row][col]:animateLine();
+		self.paint[row][col].image.alpha = 1; 
 		
 		local function toWhite(  )
 			self[row][col] = 0;
@@ -192,7 +196,7 @@ function board:squareToWhite(point)
 end
 
 function board:linesToWhite( toDelete )
-	
+	print( "test" )
 	local len = #toDelete; 	
 
 	local function remove ()
@@ -201,71 +205,92 @@ function board:linesToWhite( toDelete )
 	if (len > 0) then
 		local timer = timer.performWithDelay( 50, remove, len )
 	end
+
+	local function timer4(  )
+		_doneDeleting = true
+	end
+
+	local timer4 = timer.performWithDelay( 50*len + 125, timer4, 1 )
 end
 
 
 
-function board:removeLines( )
-	local toDelete = stack.new()
+function board:removeLines(row, col )
+	print( _doneDeleting )
+	if (_doneDeleting) then
+		 _doneDeleting = false;
+		local toDelete = stack.new()
 
---[[	-- find lines in rows
-	for i=1,7 do
-		local stack = board:scanRow(self[i])
-		while (#stack ~= 0) do
-			toDelete:push({i,stack:pop()})
-		end
-	end
-	-- find lines in cols
-	-- flip first
-	local flipped = {{},{},{},{},{},{},{}}; 
-	for i=1,7 do
-		for j=1,7 do
-			flipped[j][i] = self[i][j]
-		end
-	end
-	-- find rows in flipped
-	for i=1,7 do
-		local stack = board:scanRow(flipped[i])
-		while (#stack ~= 0) do
-			toDelete:push({stack:pop(), i})
-		end
-	end
-]]--
-	----------------------------------------------------
-	-- INSERT CALL TO ALTERNATE LINE FINDING ALGORITH -- 
-	----------------------------------------------------
-
-	self:updatePathFinder();
-	self.finder()
-
-	-- delete them
-	local function timeUp ()
-		self:linesToWhite(toDelete); 
-	end 
-	
-	if (#toDelete > 0) then
-		if (not _added) then
-			local function addScore ()
-				banner.new("+" .. #toDelete*#toDelete*_waveNumber, W/2, H/2 )
-			--[[
-				OPTIONAL SECOND BANNER
-				local function timer2R(  )
-					banner.new("x" .. _waveNumber, W/2, H/2 - 150,100 )
-				end
-
-				local timer2 = timer.performWithDelay( 300, timer2R ,1 )
-			]]--
-				_score = _score + #toDelete*#toDelete*_waveNumber
-				ScoreKeeper:update(_score)
+	--[[	-- find lines in rows
+		for i=1,7 do
+			local stack = board:scanRow(self[i])
+			while (#stack ~= 0) do
+				toDelete:push({i,stack:pop()})
 			end
-			local timer = timer.performWithDelay( 500, addScore, 1 )
-			_added = true; 
 		end
-		_gotLine = true;
-		local timer = timer.performWithDelay( 500, timeUp ,1 )
-	end
+		-- find lines in cols
+		-- flip first
+		local flipped = {{},{},{},{},{},{},{}}; 
+		for i=1,7 do
+			for j=1,7 do
+				flipped[j][i] = self[i][j]
+			end
+		end
+		-- find rows in flipped
+		for i=1,7 do
+			local stack = board:scanRow(flipped[i])
+			while (#stack ~= 0) do
+				toDelete:push({stack:pop(), i})
+			end
+		end
+	]]--
+		----------------------------------------------------
+		-- INSERT CALL TO ALTERNATE LINE FINDING ALGORITH -- 
+		----------------------------------------------------
 
---	toDelete = nil;  
+		self.finder.stack = nil
+		self.finder.stack = stack.new()
+		
+		self:updatePathFinder();
+			
+		self.finder:find(row,col); 
+		if (#self.finder.stack < 4) then 
+			self.finder.stack = nil
+			self.finder.stack = stack.new()
+		else 
+			_noShrink = true; 	
+			while (#self.finder.stack > 0) do 
+				toDelete:push(self.finder.stack:pop())
+			end
+
+		end
+		local numBlocks = #toDelete
+		-- delete them
+		if (numBlocks > 0) then
+			_combo = _combo*2
+			if (not _added) then
+					_pickedUp = nil
+					banner.new("+" .. numBlocks*numBlocks*_combo, W/2, H/2 )
+					_score = _score + numBlocks*numBlocks*_combo
+					
+					local function timer3(  )
+						banner.new("×".._combo, W/2, H/2 )
+					end
+
+				--	if (_combo > 2) then
+						local timer3 = timer.performWithDelay( 500, timer3 )
+				--	end
+						
+
+					ScoreKeeper:update(_score)
+					numBlocks = 0; 
+				_added = true; 
+			end
+			_gotLine = true;
+			self:linesToWhite(toDelete);
+		end
+		
+	end
 end
 
 function board:remove( )
@@ -282,7 +307,7 @@ function board:remove( )
 	end
 	
 	
-	local timer = timer.performWithDelay( 1, removeBlock, 49 ) 
+	local timer = timer.performWithDelay( 20, removeBlock, 49 ) 
 end
 
 function board:revive( )
@@ -300,10 +325,11 @@ function board:revive( )
 		i = i + 1; 
 	end
 	
-	local timer1 = timer.performWithDelay( 1, reviveBlock, 49 ) 
+	local timer1 = timer.performWithDelay( 20, reviveBlock, 49 ) 
 
 	function reset(  )
-		_waveNumber = 3; 
+		_waveNumber = 4;
+		_combo = 1;  
 		_placed = true; 
 		_gotLine = false;  
 		_added = false;

@@ -32,7 +32,7 @@ function nextSquare.new( c,x,y,w,h )
 		image = display.newRect( x, y, w, h ),
 		col = c, 
 	}
-
+	nextSquare.image.alpha = 1
 	toColor(nextSquare.image, 0)
 
 	return setmetatable( nextSquare, nextSquare_mt )

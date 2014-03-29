@@ -119,9 +119,28 @@ function pathFinder:toStack()
 	end
 end
 
-function pathFinder:find(node)
+function pathFinder:checkMoves(  )
+	for i=1,7 do
+		for j=1,7 do
+			self:find(i,j)
+			print( "..." )
+			self:print()
+			print( "..." )
+			if (#self.stack > 4) then
+				return true; 
+			else
+				self.stack:clear()
+			end
+		end
+	end
+	return false; 
+end
+
+function pathFinder:find(row, col)
+	local node = Node.new(row, col)
 	self:mark(node);
 	self:toStack();
+	node = nil
 end
 
 function pathFinder:mark( node, block )

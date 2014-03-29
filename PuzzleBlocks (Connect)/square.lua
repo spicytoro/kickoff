@@ -7,6 +7,7 @@ local events = require( "events" )
 
 
 local function toColor( box, id )
+--	box.blendMode = "multiply"
 	if (id == 1) then
 		box:setFillColor( 1, .2, .2 )
 	elseif (id == 2) then 
@@ -28,7 +29,7 @@ end
 
 function square.new( x, y, w, h, row, col )
 	local square = {
-		image = display.newRect( x, y, w, h ),
+		image = display.newRect( _group,x, y, w, h ),
 		row = row,
 		col = col,
 		color = 0; 
@@ -42,22 +43,32 @@ function square.new( x, y, w, h, row, col )
 			
 			-- set as picked up
 			if (_pickedUp == nil and _board[square.row][square.col] ~= 0) then
-				square:animateSize(60)
 				_pickedUp = square
 				_gotLine = false;
-				_added = false; 
+				_added = false;
+				_noShrink = false; 
+				_board:removeLines(square.row, square.col) 
+				if (not _noShrink) then
+					square:animateSize(60)
+				end
 			-- put back in same spot, if tap in same spot
 			elseif (_pickedUp == square) then 
 				square:animateSize(_squareSize, 0)
 				_pickedUp = nil 
+				_doneDeleting = true;
+			
+			elseif (_board[square.row][square.col] ~= 0) then 
+				_pickedUp:animateSize(_squareSize, 0)
+				_pickedUp = nil 
+				_doneDeleting = true;
 			-- place in new spot
 			elseif (_pickedUp ~= nil and _board[square.row][square.col] == 0) then
-				
+				_combo = 1;
 				function placed(  )
 					_placed = true;
-					_board:removeLines()	
+				--	_board:removeLines()	
 				end	
-
+				_doneDeleting = true;
 				local timer = timer.performWithDelay(150, placed, 1)  
 				-- restore size of picked up
 				_pickedUp:animateSize(_squareSize, 0)
@@ -134,7 +145,7 @@ end
 function square:animateLine(  )
 	local function two () 
 		local one = transition.to(self.image, {
-			time = 125, 
+			time = 100, 
 			width = _squareSize,
 			height = _squareSize,
 			transition=easing.inQuad,

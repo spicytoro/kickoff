@@ -36,6 +36,12 @@ function stack:push( a )
 	return a
 end
 
+function stack:clear( )
+	while (#self > 0) do 
+		self:pop(); 
+	end
+end
+
 function stack:pop()
 	return table.remove( self )
 end
