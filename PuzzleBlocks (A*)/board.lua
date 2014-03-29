@@ -8,6 +8,7 @@ local W, H = display.contentWidth, display.contentHeight
 local square = require("square")
 local stack = require("stack")
 local banner = require("banner")
+local pathFinder = require("pathFinder")
 local ScoreKeeper = require( "ScoreKeeper" )
 local ScoreKeeper = ScoreKeeper.new("score")
 
@@ -24,9 +25,12 @@ function board.new(  )
 		{0,0,0,0,0,0,0},
 		{0,0,0,0,0,0,0},
 		{0,0,0,0,0,0,0},
-		paint = {{},{},{},{},{},{},{}}
+		paint = {{},{},{},{},{},{},{}},
+		finder = nil
 	}
 	
+	local map = {{},{},{},{},{},{},{}}
+
 	local x = W/2
 	local y = H/2
 	local spacing = 84
@@ -34,10 +38,13 @@ function board.new(  )
 	
 	for i=1, 7 do
 		for j=1, 7 do
+			map[i][j] = board[i][j];
 			board.paint[i][j] = square.new( x - (3*spacing) + spacing*(j-1), y - (3*spacing) + spacing*(i-1), size, size, i, j)
 			board.paint[i][j]:setColor(0)
 		end
 	end
+
+	board.finder = pathFinder.new(map); 
 
 	return setmetatable( board, board_mt )
 	
@@ -77,6 +84,20 @@ end
 -------------
 -- Methods -- 
 -------------
+
+function board:updatePathFinder( )
+	local map = {{},{},{},{},{},{},{}}
+	
+	for i=1, 7 do
+		for j=1, 7 do
+			map[i][j] = self[i][j];
+		end
+	end
+	
+	self.finder:newMap(map); 
+
+	map = nil; 
+end
 
 function board:print(input)
 
@@ -186,7 +207,8 @@ end
 
 function board:removeLines( )
 	local toDelete = stack.new()
-	-- find lines in rows
+
+--[[	-- find lines in rows
 	for i=1,7 do
 		local stack = board:scanRow(self[i])
 		while (#stack ~= 0) do
@@ -208,9 +230,13 @@ function board:removeLines( )
 			toDelete:push({stack:pop(), i})
 		end
 	end
-		
+]]--
+	----------------------------------------------------
+	-- INSERT CALL TO ALTERNATE LINE FINDING ALGORITH -- 
+	----------------------------------------------------
 
-	
+	self:updatePathFinder();
+	self.finder()
 
 	-- delete them
 	local function timeUp ()
@@ -221,13 +247,14 @@ function board:removeLines( )
 		if (not _added) then
 			local function addScore ()
 				banner.new("+" .. #toDelete*#toDelete*_waveNumber, W/2, H/2 )
-
+			--[[
+				OPTIONAL SECOND BANNER
 				local function timer2R(  )
-				--	banner.new("x" .. _waveNumber, W/2, H/2 - 150,100 )
+					banner.new("x" .. _waveNumber, W/2, H/2 - 150,100 )
 				end
 
 				local timer2 = timer.performWithDelay( 300, timer2R ,1 )
-
+			]]--
 				_score = _score + #toDelete*#toDelete*_waveNumber
 				ScoreKeeper:update(_score)
 			end
@@ -320,9 +347,6 @@ function board:scanRow( row )
 	return stack
 end
 return board
-
-
-
 
 
 
