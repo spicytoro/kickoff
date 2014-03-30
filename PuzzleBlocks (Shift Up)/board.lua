@@ -80,10 +80,20 @@ local function updateCount( input )
 	end
 end
 
--- 0,3,3,3,3,8,9
 -------------
 -- Methods -- 
 -------------
+
+function board:shiftUp(	)
+	for i=2,7 do
+		for j=1,7 do
+			self:place(i-1, j, self[i][j], 1)
+		end
+	end
+	for i=1,7 do
+		self:place(7, i, 0, 1)
+	end
+end
 
 function board:updatePathFinder( )
 	local map = {{},{},{},{},{},{},{}}
@@ -112,9 +122,11 @@ function board:print(input)
 	print( "-------------" )
 end
 
-function board:place(row,col,color)
+function board:place(row,col,color,noAnim)
 	self[row][col] = color; 
-	self.paint[row][col]:animatePutDown(_squareSize); 
+	if (not noAnim) then 
+		self.paint[row][col]:animatePutDown(_squareSize); 
+	end 
 	self:updateColor(); 
 end
 
@@ -129,13 +141,11 @@ end
 
 function board:spotsLeft ()
 	local spots = 0; 
-	for i=1,7 do
 		for j=1,7 do
-			if (self[i][j] == 0) then 
+			if (self[7][j] == 0) then 
 				spots = spots + 1;  
 			end
 		end
-	end
 	return spots; 
 end 
 
@@ -145,15 +155,15 @@ function board:nextWave( squares )
 		if (not _gameOver) then
 			
 			if (self:spotsLeft() > 0) then 
-				local row = math.random(1,7)
-				local col = math.random(1,7)
+				local row = 7
+				local col = 1
 
 				while (self[row][col] ~= 0) do 
-					row = math.random(1,7)
-					col = math.random(1,7)
+					row = 7
+					col = col + 1
 				end
 				self:place(row,col,_colors:remove())
-				_nextBlocks:toColor()
+				_nextBlocks:toColor(col-1)
 			--	_nextBlocksTop:toColor()
 
 			--	self:print(  )
@@ -170,7 +180,7 @@ function board:nextWave( squares )
 		squares = self:spotsLeft() + 1;
 	end
 	
-	local timerz = timer.performWithDelay( 250, placeIt, squares )
+	local timerz = timer.performWithDelay( 70, placeIt, squares )
 
 --	local function removeIt(  )
 --		self:removeLines()
@@ -288,6 +298,8 @@ function board:removeLines(row, col )
 			end
 			_gotLine = true;
 			self:linesToWhite(toDelete);
+		else
+			_combo = 1;
 		end
 		
 	end
@@ -303,6 +315,9 @@ function board:remove( )
 			j = j+1
 		end
 		self.paint[i][j]:removeSquare( );
+		self.paint[j][i]:removeSquare( );
+		self.paint[8-i][8-j]:removeSquare( );
+		self.paint[8-j][8-i]:removeSquare( );
 		i = i + 1; 
 	end
 	
@@ -320,15 +335,21 @@ function board:revive( )
 			j = j+1
 		end
 		_board[i][j] = 0;
+		_board[j][i] = 0;
+		_board[8-i][8-j] = 0;
+		_board[8-j][8-i] = 0;
 		_board:updateColor();
 		self.paint[i][j]:reviveSquare( );
+		self.paint[j][i]:reviveSquare( );
+		self.paint[8-i][8-j]:reviveSquare( );
+		self.paint[8-j][8-i]:reviveSquare( );
 		i = i + 1; 
 	end
 	
 	local timer1 = timer.performWithDelay( 20, reviveBlock, 49 ) 
 
 	function reset(  )
-		_waveNumber = 4;
+		_waveNumber = 7;
 		_combo = 1;  
 		_placed = true; 
 		_gotLine = false;  

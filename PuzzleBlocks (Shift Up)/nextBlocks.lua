@@ -17,10 +17,10 @@ function nextBlocks.new( yVal )
 	
 	local x = W/2
 	local y = yVal+2
-	local spacing = W/5
+	local spacing = W/7
 	local size = 15
-	for j=1, 5 do
-		nextBlocks[j] = nextSquare.new(j, x - (2*spacing) + spacing*(j-1), y, W/5, size)
+	for j=1, 7 do
+		nextBlocks[j] = nextSquare.new(j, x - (3*spacing) + spacing*(j-1), y, W/7, size)
 	end
 	return setmetatable( nextBlocks, nextBlocks_mt )
 end
@@ -29,15 +29,14 @@ end
 -- Methods -- 
 -------------
 
-function nextBlocks:toColor( )
-	for i=1,5 do
+function nextBlocks:toColor( input )
+	for i=1,7 do
 		self[i]:toColor()
 	end
-	
 end
 
 function nextBlocks:remove(  )
-	for i=1,5 do
+	for i=1,7 do
 		self[i]:remove()
 	end
 end

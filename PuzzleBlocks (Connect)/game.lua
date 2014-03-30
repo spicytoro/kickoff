@@ -63,7 +63,7 @@ function scene:createScene( event )
 
 
 	local board = board.new()
-
+board:edgify();
 	local comboText = display.newText( { 
 		text = "",
 		x = W/2, 
@@ -91,7 +91,7 @@ function scene:createScene( event )
 --	_nextBlocksTop = nextBlocksTop 
 	_board = board;
 	for i=1,7 do
-		_colors:add(math.random(1,5))
+		_colors:add(math.random(1,_numberColors))
 	end
 	
 	function playAgain:touch(e)
@@ -106,6 +106,7 @@ function scene:createScene( event )
 			-----------
 				local function resetGame(  )
 					local tranny = transition.to(gameOverText, {time = 1000, alpha = 0})
+					 
 					_score = 0;
 					_combo = 0; 
 					scoreText.text = "0"
@@ -119,7 +120,7 @@ function scene:createScene( event )
 					resetGame()
 				else
 					board:remove()
-					local timer3 = timer.performWithDelay( 2000, resetGame, 1)
+					local timer3 = timer.performWithDelay( 500, resetGame, 1)
 				end
 
 				-- if gameover reset
@@ -159,7 +160,7 @@ function scene:createScene( event )
 		if (not _gotLine) then
 			if (_placed) then
 				for i=1,_waveNumber do
-					_colors:add(math.random(1,5))
+					_colors:add(math.random(1,_numberColors))
 				end
 				board:nextWave(_waveNumber)
 				_placed = false; 

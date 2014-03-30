@@ -84,6 +84,25 @@ end
 -------------
 -- Methods -- 
 -------------
+function board:edgify(  )
+	local left = 4-math.floor(_boardH/2)
+	local right = 4+math.floor(_boardH/2)
+	local up = 4-math.floor(_boardW/2)
+	local down = 4+math.floor(_boardW/2)
+	print( left, right )
+	for i=1,7 do
+		for j=1,7 do
+			self[i][j] = 0;
+			if (i < left or i > right) then
+				self[i][j] = -1;
+			end
+			if (j < up or j > down) then				
+				self[i][j] = -1;
+			end
+		end
+	end
+	self:updateColor();
+end
 
 function board:updatePathFinder( )
 	local map = {{},{},{},{},{},{},{}}
@@ -128,29 +147,33 @@ function board:updateColor(  )
 end
 
 function board:spotsLeft ()
+	local indexW = math.floor(_boardW/2)
+	local indexH = math.floor(_boardH/2)
 	local spots = 0; 
-	for i=1,7 do
-		for j=1,7 do
+	for i=4-indexH,4+indexH do
+		for j=4-indexW,4+indexW do
 			if (self[i][j] == 0) then 
 				spots = spots + 1;  
 			end
 		end
 	end
+	print( 4-indexH,4+indexH,spots )
 	return spots; 
 end 
 
 function board:nextWave( squares )
-	 
+	local indexW = math.floor(_boardW/2)
+	local indexH = math.floor(_boardH/2)
 	local function placeIt ()
 		if (not _gameOver) then
 			
 			if (self:spotsLeft() > 0) then 
-				local row = math.random(1,7)
-				local col = math.random(1,7)
+				local row = math.random(4-indexH,4+indexH)
+				local col = math.random(4-indexW,4+indexW)
 
-				while (self[row][col] ~= 0) do 
-					row = math.random(1,7)
-					col = math.random(1,7)
+				while (self[row][col] ~= 0 ) do 
+					row = math.random(4-indexH,4+indexH)
+					col = math.random(4-indexW,4+indexW)
 				end
 				self:place(row,col,_colors:remove())
 				_nextBlocks:toColor()
@@ -295,40 +318,59 @@ end
 
 function board:remove( )
 
-	local i,j = 1,1
+	local row = 1
 
 	function removeBlock(  )
-		if (i == 8) then
-			i = 1
-			j = j+1
+		for i=row,8-row do
+			self.paint[row][i]:removeSquare( );
+			self.paint[i][row]:removeSquare( );
+			self.paint[8-row][8-i]:removeSquare( );
+			self.paint[8-i][8-row]:removeSquare( );
 		end
-		self.paint[i][j]:removeSquare( );
-		i = i + 1; 
+		row = row+1
 	end
 	
 	
-	local timer = timer.performWithDelay( 20, removeBlock, 49 ) 
+	local timer = timer.performWithDelay( 100, removeBlock, 4 ) 
 end
 
 function board:revive( )
-
-	local i,j = 1,1
+--[[
+	local row = 4
 
 	function reviveBlock(  )
-		if (i == 8) then
-			i = 1
-			j = j+1
+
+		for i=4-(row-4),row do
+			_board[row][i] = 0;
+			_board[i][row] = 0;
+			_board[8-row][8-i] = 0;
+			_board[8-i][8-row] = 0;
+			_board:updateColor();
+			self.paint[row][i]:reviveSquare( );
+			self.paint[i][row]:reviveSquare( );
+			self.paint[8-row][8-i]:reviveSquare( );
+			self.paint[8-i][8-row]:reviveSquare( );
 		end
-		_board[i][j] = 0;
-		_board:updateColor();
-		self.paint[i][j]:reviveSquare( );
-		i = i + 1; 
+		row = row+1
+	end
+]]--
+	local row = 1
+
+	function reviveBlock(  )
+		for i=row,8-row do
+			self:edgify()
+			self.paint[row][i]:reviveSquare( );
+			self.paint[i][row]:reviveSquare( );
+			self.paint[8-row][8-i]:reviveSquare( );
+			self.paint[8-i][8-row]:reviveSquare( );
+		end
+		row = row+1
 	end
 	
-	local timer1 = timer.performWithDelay( 20, reviveBlock, 49 ) 
+	local timer1 = timer.performWithDelay( 100, reviveBlock, 4 ) 
 
 	function reset(  )
-		_waveNumber = 4;
+	--	_waveNumber = 1;
 		_combo = 1;  
 		_placed = true; 
 		_gotLine = false;  
@@ -336,7 +378,7 @@ function board:revive( )
 		_gameOver = false;
 	end
 
-	local timer2 = timer.performWithDelay( 2000, reset, 1 ) 
+	local timer2 = timer.performWithDelay( 1000, reset, 1 ) 
 end
 
 function board:scanRow( row )

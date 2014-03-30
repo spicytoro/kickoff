@@ -1,11 +1,15 @@
 local Queue = require("Queue")
 _colors = Queue.new()
 
+_numberColors = 4
+_boardW = 7
+_boardH = 5
+_waveNumber = 1;
+
 _doneDeleting = true; 
 _group = nil; 
 _combo = 1
 _noShrink = false; 
-_waveNumber = 4; 
 _pickedUp = nil;
 _board = nil; 
 _nextBlocks = nil

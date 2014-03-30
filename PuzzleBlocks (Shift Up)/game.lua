@@ -104,10 +104,11 @@ function scene:createScene( event )
 			-----------
 			-- Reset -- 
 			-----------
-				local function resetGame(  )
+			local function resetGame(  )
 					local tranny = transition.to(gameOverText, {time = 1000, alpha = 0})
 					_score = 0;
-					_combo = 0; 
+					_combo = 0;
+					_shifts = 2
 					scoreText.text = "0"
 					board:revive();
 					display.getCurrentStage( ):setFocus(nil)
@@ -123,6 +124,7 @@ function scene:createScene( event )
 				end
 
 				-- if gameover reset
+			
 
 			end
 		end
@@ -161,8 +163,9 @@ function scene:createScene( event )
 				for i=1,_waveNumber do
 					_colors:add(math.random(1,5))
 				end
+				board:shiftUp()
 				board:nextWave(_waveNumber)
-				_placed = false; 
+				_placed = false;
 			end
 		else
 			_placed = false;  

@@ -47,7 +47,7 @@ function square.new( x, y, w, h, row, col )
 				_gotLine = false;
 				_added = false;
 				_noShrink = false; 
-				_board:removeLines(square.row, square.col) 
+				
 				if (not _noShrink) then
 					square:animateSize(60)
 				end
@@ -63,7 +63,7 @@ function square.new( x, y, w, h, row, col )
 				_doneDeleting = true;
 			-- place in new spot
 			elseif (_pickedUp ~= nil and _board[square.row][square.col] == 0) then
-				_combo = 1;
+				
 				function placed(  )
 					_placed = true;
 				--	_board:removeLines()	
@@ -86,6 +86,7 @@ function square.new( x, y, w, h, row, col )
 				_board:updateColor();
 								
 				_pickedUp = nil; 
+				_board:removeLines(square.row, square.col) 
 			end
 			 
 		end

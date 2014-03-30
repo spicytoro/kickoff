@@ -20,6 +20,8 @@ local function toColor( box, id )
 		box:setFillColor( 1, .7, .2 )
 	elseif (id == 0) then 
 		box:setFillColor( .915, .915, .915 )
+	elseif (id == -1) then 
+		box:setFillColor( 1, 1, 1 )
 	end
 end
 
@@ -42,12 +44,12 @@ function square.new( x, y, w, h, row, col )
 		if (e.phase == "began") then
 			
 			-- set as picked up
-			if (_pickedUp == nil and _board[square.row][square.col] ~= 0) then
+			if (_pickedUp == nil and _board[square.row][square.col] ~= 0 and _board[square.row][square.col] ~= -1) then
 				_pickedUp = square
 				_gotLine = false;
 				_added = false;
 				_noShrink = false; 
-				_board:removeLines(square.row, square.col) 
+				 
 				if (not _noShrink) then
 					square:animateSize(60)
 				end
@@ -57,7 +59,7 @@ function square.new( x, y, w, h, row, col )
 				_pickedUp = nil 
 				_doneDeleting = true;
 			
-			elseif (_board[square.row][square.col] ~= 0) then 
+			elseif (_board[square.row][square.col] ~= 0 and _board[square.row][square.col] ~= -1) then 
 				_pickedUp:animateSize(_squareSize, 0)
 				_pickedUp = nil 
 				_doneDeleting = true;
@@ -84,7 +86,7 @@ function square.new( x, y, w, h, row, col )
 				-- _board:place(_pickedUp.row,_pickedUp.col, math.random(1,5))
 				
 				_board:updateColor();
-								
+				_board:removeLines(square.row, square.col)				
 				_pickedUp = nil; 
 			end
 			 
